@@ -1,45 +1,6 @@
-# .PHONY: install test tests lr features
-
-# # Use Python to set PYTHONPATH
-# PYTHON_PATH_SET := python -c "import os, sys; os.environ['PYTHONPATH'] = os.path.abspath('.')+os.pathsep+os.environ.get('PYTHONPATH',''); sys.exit(0)"
-
-# default: test
-
-# install:
-# 	pip install -e .
-# 	pip install pytest-colored
-
-# test: tests
-
-# tests:
-# 	$(PYTHON_PATH_SET) && pytest -s --color=yes
-
-# lr:
-# 	$(PYTHON_PATH_SET) && pytest -s --color=yes ./tests/test_linear_regression.py
-
-# features:
-# 	$(PYTHON_PATH_SET) && pytest -s --color=yes ./tests/test_features.py
-
-
-# .PHONY: install test
-
-# default: test
-
-# install:
-# 	pip install -e .
-
-# test:
-# 	PYTHONPATH=./ pytest -s
-
-# lr:
-# 	PYTHONPATH=./ pytest -s ./tests/test_linear_regression.py
-	
-# features:
-# 	PYTHONPATH=./ pytest -s ./tests/test_features.py
-
 
 # Phony targets
-.PHONY: all install test tests lr features
+.PHONY: all install test tests 
 
 # Detect OS
 ifeq ($(OS),Windows_NT)
