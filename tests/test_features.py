@@ -20,9 +20,9 @@ class TestFeatures(TestCase):
         
         
     def test_min_max_scaler(self):
+        scaler = MinMaxScaler()
         data = [[-1, 2], [-0.5, 6], [0, 10], [1, 18]]
         expected = np.array([[0., 0.], [0.25, 0.25], [0.5, 0.5], [1., 1.]])
-        scaler = MinMaxScaler()
         scaler.fit(data)
         result = scaler.transform(data)
         assert (result == expected).all(), "Scaler transform does not return expected values. All Values should be between 0 and 1. Got: {}".format(result.reshape(1,-1))
@@ -63,6 +63,36 @@ class TestFeatures(TestCase):
         assert (result == expected).all(), "Scaler transform does not return expected values. Expect {}. Got: {}".format(expected.reshape(1,-1), result.reshape(1,-1))
 
     # TODO: Add a test of your own below this line
+
+    def test_scalers_with_constant_feature(self):
+        
+        # Data with a constant feature
+        data = [[1, 5, 0], [2, 5, 1], [3, 5, 2], [4, 5, 3]]
+        
+        # Test MinMaxScaler
+        mm_scaler = MinMaxScaler()
+        mm_result = mm_scaler.fit_transform(data)
+        
+        # Check if MinMaxScaler handles constant feature (should be NaN)
+        assert all(np.isnan(x) for x in mm_result[:, 1]), "MinMaxScaler should return NaN for constant feature"
+        
+        # Verify other features are scaled correctly
+        assert np.allclose(mm_result[:, 0], [0, 1/3, 2/3, 1]), "MinMaxScaler failed to scale non-constant feature correctly"
+        assert np.allclose(mm_result[:, 2], [0, 1/3, 2/3, 1]), "MinMaxScaler failed to scale non-constant feature correctly"
+        
+        # Test StandardScaler
+        std_scaler = StandardScaler()
+        std_result = std_scaler.fit_transform(data)
+        
+        # Check if StandardScaler handles constant feature (should be NaN)
+        assert all(np.isnan(x) for x in std_result[:, 1]), "StandardScaler should return NaN for constant feature"
+        
+        # Verify other features are scaled correctly
+        assert np.allclose(np.mean(std_result[:, 0]), 0) and np.allclose(np.std(std_result[:, 0]), 1), \
+            "StandardScaler failed to scale non-constant feature correctly"
+        assert np.allclose(np.mean(std_result[:, 2]), 0) and np.allclose(np.std(std_result[:, 2]), 1), \
+            "StandardScaler failed to scale non-constant feature correctly"
+
     
 if __name__ == '__main__':
     unittest.main()

@@ -1,58 +1,74 @@
 import numpy as np
-from typing import List, Tuple
+from typing import List, Union, TypeVar
 
-def _check_is_array(x: np.ndarray) -> np.ndarray:
+# Type aliases
+ArrayLike = Union[List, np.ndarray]
+NDArray = np.ndarray
+
+def _check_is_array(x: ArrayLike) -> NDArray:
     """
     Try to convert x to a np.ndarray if it's not a np.ndarray and return. If it can't be cast raise an error
     """
     if not isinstance(x, np.ndarray):
-        x = np.array(x)
-        
-    assert isinstance(x, np.ndarray), "Expected the input to be a list"
+        x = np.array(x, dtype=float)
+    
+    assert isinstance(x, np.ndarray), "Expected the input to be a list or numpy array"
     return x
 
 class MinMaxScaler:
     def __init__(self):
-        self.minimum = None
-        self.maximum = None
+        self.minimum: NDArray = None
+        self.maximum: NDArray = None
     
-    def fit(self, x: np.ndarray) -> None:   
+    def fit(self, x: ArrayLike) -> None:
         x = _check_is_array(x)
-        self.minimum = x.min(axis=0)
-        self.maximum = x.max(axis=0)
-        
-    def transform(self, x: np.ndarray) -> list:
+        self.minimum = np.min(x, axis=0)
+        self.maximum = np.max(x, axis=0)
+    
+    def transform(self, x: ArrayLike) -> NDArray:
         """
         MinMax Scale the given vector
         """
         x = _check_is_array(x)
         
-        # Fixed: Added parentheses to ensure correct order of operations
-        return (x - self.minimum) / (self.maximum - self.minimum)
+        # Handle division by zero for constant features
+        with np.errstate(divide='ignore', invalid='ignore'):
+            result = (x - self.minimum) / (self.maximum - self.minimum)
+        
+        # Replace inf and -inf with nan
+        result[~np.isfinite(result)] = np.nan
+        
+        return result
     
-    def fit_transform(self, x: list) -> np.ndarray:
-        x = _check_is_array(x)
+    def fit_transform(self, x: ArrayLike) -> NDArray:
         self.fit(x)
         return self.transform(x)
 
 class StandardScaler:
     def __init__(self):
-        self.mean = None
-        self.std = None
+        self.mean: NDArray = None
+        self.std: NDArray = None
     
-    def fit(self, x: np.ndarray) -> None:
+    def fit(self, x: ArrayLike) -> None:
         x = _check_is_array(x)
         self.mean = np.mean(x, axis=0)
         self.std = np.std(x, axis=0)
     
-    def transform(self, x: np.ndarray) -> list:
+    def transform(self, x: ArrayLike) -> NDArray:
         """
         Standard Scale the given vector
         """
         x = _check_is_array(x)
-        return (x - self.mean) / self.std
+        
+        # Handle division by zero for constant features
+        with np.errstate(divide='ignore', invalid='ignore'):
+            result = (x - self.mean) / self.std
+        
+        # Replace inf and -inf with nan
+        result[~np.isfinite(result)] = np.nan
+        
+        return result
     
-    def fit_transform(self, x: list) -> np.ndarray:
-        x = _check_is_array(x)
+    def fit_transform(self, x: ArrayLike) -> NDArray:
         self.fit(x)
         return self.transform(x)
