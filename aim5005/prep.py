@@ -28,3 +28,35 @@ def correlation(x: List[float], y:List[float]) -> float:
         return covariance(x, y)/std_x/std_y
     else:
         return 0
+
+
+def zscore(x: List[float]) -> List[float]: 
+    """
+    Compute the z-score for each value in a list of numbers 
+
+    The z-score represents the number of standard deviations by which the value is above the mean.
+    A z-score of 0 means the value is equal to the mean, while a z-score of 1 means the value
+    is one standard deviation above the mean.
+    """
+
+    mean_val = np.mean(x)
+    std_val = np.std(x)
+
+    return [(xi - mean_val) / std_val for xi in x] if std_val > 0 else [0] * lean(x)
+
+
+def summary_statistics(x: List[float]) -> dict:  
+    """
+    Compute summary statistics for a list of numbers.
+    """
+
+    return {
+        "mean": np.mean(x),
+        "median": np.median(x),
+        "std_dev": np.std(x),
+        "min": np.min(x),
+        "max": np.max(x),
+        "q1": np.percentile(x, 25),
+        "q3": np.percentile(x, 75)
+
+    }

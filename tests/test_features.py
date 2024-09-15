@@ -1,4 +1,4 @@
-from aim5005.features import MinMaxScaler, StandardScaler
+from aim5005.features import MinMaxScaler, StandardScaler, LabelEncoder
 import numpy as np
 import unittest
 from unittest.case import TestCase
@@ -10,15 +10,13 @@ class TestFeatures(TestCase):
         scaler = MinMaxScaler()
         assert isinstance(scaler, MinMaxScaler), "scaler is not a MinMaxScaler object"
         
-        
     def test_min_max_fit(self):
         scaler = MinMaxScaler()
         data = [[-1, 2], [-0.5, 6], [0, 10], [1, 18]]
         scaler.fit(data)
         assert (scaler.maximum == np.array([1., 18.])).all(), "scaler fit does not return maximum values [1., 18.] "
         assert (scaler.minimum == np.array([-1., 2.])).all(), "scaler fit does not return maximum values [-1., 2.] " 
-        
-        
+           
     def test_min_max_scaler(self):
         scaler = MinMaxScaler()
         data = [[-1, 2], [-0.5, 6], [0, 10], [1, 18]]
@@ -64,9 +62,8 @@ class TestFeatures(TestCase):
 
     # TODO: Add a test of your own below this line
 
-    def test_scalers_with_constant_feature(self):
+    def test_min_max_scalers_with_constant_feature(self):
         
-        # Data with a constant feature
         data = [[1, 5, 0], [2, 5, 1], [3, 5, 2], [4, 5, 3]]
         
         # Test MinMaxScaler
@@ -79,6 +76,11 @@ class TestFeatures(TestCase):
         # Verify other features are scaled correctly
         assert np.allclose(mm_result[:, 0], [0, 1/3, 2/3, 1]), "MinMaxScaler failed to scale non-constant feature correctly"
         assert np.allclose(mm_result[:, 2], [0, 1/3, 2/3, 1]), "MinMaxScaler failed to scale non-constant feature correctly"
+        
+
+    def test_std_scalers_with_constant_feature(self): 
+
+        data = [[1, 5, 0], [2, 5, 1], [3, 5, 2], [4, 5, 3]]
         
         # Test StandardScaler
         std_scaler = StandardScaler()
@@ -93,6 +95,49 @@ class TestFeatures(TestCase):
         assert np.allclose(np.mean(std_result[:, 2]), 0) and np.allclose(np.std(std_result[:, 2]), 1), \
             "StandardScaler failed to scale non-constant feature correctly"
 
-    
+
+class TestLabelEncoder(TestCase):
+    def test_initialize_label_encoder(self):
+        encoder = LabelEncoder()
+        assert isinstance(encoder, LabelEncoder), "encoder is not a Label Encoder object "
+
+    def test_label_encoder_fit(self):
+        encoder = LabelEncoder()
+        data = ['cat', 'dog', 'bird', 'cat', 'dog']
+        expected = np.array(['bird', 'cat', 'dog'])
+        encoder.fit(data)
+        assert (encoder.classes_ == expected).all(), "encoder fit does not return correct classes"
+
+    def test_label_encoder_transform(self):
+        encoder = LabelEncoder()
+        data = ['cat', 'dog', 'bird', 'cat', 'dog']
+        expected = np.array([1, 2, 0, 1, 2])
+        encoder.fit(data)
+        result = encoder.transform(data)
+        assert (result == expected).all(), f"Encoder transform does not return expected values. Expected: {expected}, Got: {result}"
+
+    def test_label_encoder_fit_transform(self):
+        encoder = LabelEncoder()
+        data = ['apple', 'banana', 'apple', 'cherry']
+        expected = np.array([0, 1, 0, 2])
+        result = encoder.fit_transform(data)
+        assert (result == expected).all(), f"Encoder fit_transform does not return expected values. Expected: {expected}, Got: {result}"
+
+    def test_label_encoder_transform_unseen_label(self):
+        encoder = LabelEncoder()
+        data = ['cat', 'dog', 'bird']
+        encoder.fit(data)
+        result = encoder.transform(['fish', 'dog', 'cat'])
+        expected = np.array([-1, 2, 1])
+        assert (result == expected).all(), f"Encoder transform does not handle unseen label correctly. Expected: {expected}, Got: {result}"
+
+    def test_label_encoder_with_numeric_labels(self):
+        encoder = LabelEncoder()
+        data = [1, 2, 3, 1, 2, 3, 4]
+        expected = np.array([0, 1, 2, 0, 1, 2, 3])
+        result = encoder.fit_transform(data)
+        assert (result == expected).all(), f"Encoder fit_transform does not handle numeric labels correctly. Expected: {expected}, Got: {result}"
+
+
 if __name__ == '__main__':
     unittest.main()

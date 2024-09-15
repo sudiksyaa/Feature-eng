@@ -8,8 +8,7 @@ class LinearRegresion:
         self.beta = None
     
     def predict(self, x:List[float]) -> float:
-        """ Given values, x, predict the y value
-        """
+        """ Given values, x, predict the y value """
         return self.intercept + self.beta * np.array(x)
     
     def fit(self, x: List[float], y:List[float]) -> None:
