@@ -51,6 +51,7 @@ class TestFeatures(TestCase):
         data = [[0, 0], [0, 0], [1, 1], [1, 1]]
         expected = np.array([[-1., -1.], [-1., -1.], [1., 1.], [1., 1.]])
         scaler.fit(data)
+        result = scaler.transform(data)
         assert (result == expected).all(), "Scaler transform does not return expected values. Expect {}. Got: {}".format(expected.reshape(1,-1), result.reshape(1,-1))
         
     def test_standard_scaler_single_value(self):
@@ -62,6 +63,15 @@ class TestFeatures(TestCase):
         assert (result == expected).all(), "Scaler transform does not return expected values. Expect {}. Got: {}".format(expected.reshape(1,-1), result.reshape(1,-1))
 
     # TODO: Add a test of your own below this line
+    def test_standard_scaler_variance(self):
+        """Ensure that transformed data has mean 0 and variance 1"""
+        scaler = StandardScaler()
+        data = [[0, 0], [0, 0], [1, 1], [1, 1]]
+       
+        scaler.fit(data)
+        transformed = scaler.transform(data)
+        assert np.allclose(transformed.mean(axis=0), [0, 0]), "Mean after transformation should be 0"
+        assert np.allclose(transformed.std(axis=0, ddof=0), [1, 1]), "Std dev after transformation should be 1"
     
 if __name__ == '__main__':
     unittest.main()
