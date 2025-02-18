@@ -1,3 +1,6 @@
+import sys
+
+sys.path.append('/Users/sudi/Documents/Feature-eng-1')
 from aim5005.features import MinMaxScaler, StandardScaler
 import numpy as np
 import unittest
@@ -51,6 +54,7 @@ class TestFeatures(TestCase):
         data = [[0, 0], [0, 0], [1, 1], [1, 1]]
         expected = np.array([[-1., -1.], [-1., -1.], [1., 1.], [1., 1.]])
         scaler.fit(data)
+        result = scaler.transform(data)
         assert (result == expected).all(), "Scaler transform does not return expected values. Expect {}. Got: {}".format(expected.reshape(1,-1), result.reshape(1,-1))
         
     def test_standard_scaler_single_value(self):
